@@ -1,0 +1,10 @@
+room1:=http://3.83.84.211/doc/3bc2dbb9-063d-49b3-a11d-40b399e7940e
+room2:=http://3.83.84.211/doc/75faa22e-afe0-412d-b3a7-d6bec09d67f2
+room3:=http://3.83.84.211/doc/f69f293d-329b-42bd-a013-8babf54a5fdb
+room4:=http://3.83.84.211/doc/c6e4f815-0b72-4bed-928e-99c299892856
+room5:=http://3.83.84.211/doc/64b6251f-7880-45d3-a191-47aa1ae5eb97
+room6:=http://3.83.84.211/doc/2353a06b-3b2a-42dd-bc9a-6d0c6609350c
+room7:=http://3.83.84.211/doc/a3e85765-1e67-47ce-8afb-358114aa0472
+room8:=http://3.83.84.211/doc/2ccf8083-85fe-4098-8fc9-f8b412e5ea9d
+room9:=http://3.83.84.211/doc/a0343553-f2ac-42b3-a8a1-f4216c0f2a9a
+eof

@@ -1,40 +1,43 @@
+const { TournamentModel } = require('../models/tournament');
 const puppeteer = require('puppeteer');
-const fs = require('fs');
+const { playersModel } = require('../models/players');
 
-const setup = () => {
-    (async () => {
-        try {
-            const file = fs.readFileSync('url.txt', 'utf8').toString().trim();
-            if (file.endsWith('eof')) return;
-            else {
-                const browser = await puppeteer.launch({
-                    userDataDir: './data',
-                    args: ['--no-sandbox'],
+const setup = async (n = undefined) => {
+    try {
+        const tournamentRoom = await TournamentModel.find({});
+        const totalRooms = tournamentRoom.length;
+        if (!n && totalRooms > 0) return;
+        else {
+            const browser = await puppeteer.launch({
+                userDataDir: './data',
+                args: ['--no-sandbox'],
+            });
+            for (
+                let roomId = 0, counter = n ? totalRooms + 1 : 1;
+                roomId < (n || 1);
+                roomId++, counter++
+            ) {
+                const page = await browser.newPage();
+                await page.goto('http://3.83.84.211', {
+                    waitUntil: 'domcontentloaded',
+                    timeout: 0,
                 });
-                for (let roomId = 1; roomId < 10; roomId++) {
-                    const page = await browser.newPage();
-                    await page.goto('http://3.83.84.211', {
-                        waitUntil: 'domcontentloaded',
-                        timeout: 0,
-                    });
-                    // const all = await browser.pages()
-                    // const thatPage = await all[roomId - 1]?.bringToFront()
-                    // await thatPage?.$('#square-0').click()
 
-                    // await page.waitForSelector('#square-0', { timeout: 0 })
-                    await Promise.resolve(page.waitForNavigation());
+                await Promise.resolve(page.waitForNavigation());
 
-                    let url = await page.url();
-
-                    fs.appendFileSync('./url.txt', `room${roomId}:=${url}\n`);
-                }
-                browser.close();
-                fs.appendFileSync('./url.txt', `eof\n`);
+                let url = await page.url();
+                const tournamentRoom = new TournamentModel({
+                    id: url,
+                    room: `room${counter}`,
+                });
+                const tournament = await tournamentRoom.save();
+                console.log(tournament);
             }
-        } catch (error) {
-            throw error;
+            browser.close();
         }
-    })();
+    } catch (error) {
+        throw error;
+    }
 };
 
 module.exports = setup;

@@ -1,66 +1,66 @@
-const puppeteer = require('puppeteer');
-const fs = require('fs');
-const getRoomId = (req, res) => {
-    (async () => {
-        try {
-            let roomData = new Map();
-            const file = fs
-                .readFileSync('url.txt', 'utf8')
-                .toString()
-                .trim()
-                .split('\n');
-            file.forEach((item) => {
-                item = item.split(':=');
-                roomData.set(item[0], item[1]);
-            });
-
-            if (req.method === 'GET') {
-                const roomId = roomData.get(req.query.roomId);
-                if (roomData.has(req.query.roomId)) {
-                    res.status(200).json({
-                        url: roomId,
-                    });
-                }
-            } else if (req.method === 'POST') {
-                const roomId = req.body.roomId;
-                const value = req.body.value;
-                console.log(
-                    req.body.roomId,
-                    roomId,
-                    value,
-                    '012345678'.includes(value),
-                    roomData.has(roomId)
-                );
-                if ('012345678'.includes(value) && roomData.has(roomId)) {
-                    const container = roomData.get(roomId);
-                    console.log(container);
-                    const browser = await puppeteer.launch({
-                        userDataDir: './data',
-                        args: ['--no-sandbox'],
-                    });
-                    const page = await browser.newPage();
-
-                    await page.setExtraHTTPHeaders({
-                        serverpermission: 'true',
-                    });
-
-                    await page.goto(container);
-                    await page.waitForSelector('#square-0', { timeout: 0 });
-                    // await page.waitForTimeout(1000)
-                    const cell = await page.$(`#square-${value}`);
-                    await cell.evaluate((el) => (el.style.pointerEvents = ''));
-                    await cell.click();
-
-                    // await element.click()
-                    await page.screenshot({ path: 'example.png' });
-                    await browser.close();
-                    res.status(200).end();
-                }
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const { playersModel } = require('../models/players');
+const { TournamentModel } = require('../models/tournament');
+const getRoomId = async (req, res, next) => {
+    try {
+        if (req.method === 'POST') {
+            const { username, passkey } = req.body;
+            if (!(username && passkey)) {
+                return res.status(200).json({
+                    status: 'error',
+                    data: '',
+                    error: 'All inputs required',
+                });
             }
-        } catch (error) {
-            throw error;
+            const user = await playersModel
+                .findOne({ username })
+                .populate('room');
+            if (user && (await bcrypt.compare(passkey, user.passkey))) {
+                const token = jwt.sign(
+                    {
+                        username: user.username,
+                        roomId: user.room.room,
+                    },
+                    process.env.TOKEN_KEY,
+                    {
+                        expiresIn: '3h',
+                    }
+                );
+                user.token = token;
+                await user.save();
+                console.log(user);
+                return res.status(200).json({
+                    status: 'ok',
+                    data: {
+                        token,
+                        url: user.room.id,
+                    },
+                    error: '',
+                });
+            }
+            return res.status(200).json({
+                status: 'error',
+                data: '',
+                error: 'Invalid Credentials',
+            });
+        } else if (req.method === 'GET') {
+            const rooms = await TournamentModel.find({}, { _id: 0, id: 1 });
+            res.status(200).json({
+                status: 'ok',
+                data: { rooms },
+                error: '',
+            });
+        } else {
+            res.status(200).json({
+                status: 'error',
+                data: '',
+                error: 'Invlaid http verb',
+            });
         }
-    })();
+    } catch (error) {
+        next(error);
+    }
 };
 
-module.exports = getRoomId;
+module.exports = { getRoomId };

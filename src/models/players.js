@@ -1,20 +1,30 @@
 const mongoose = require('mongoose');
 
 const PlayerSchema = new mongoose.Schema({
-    room: {
+    username: {
+        type: String,
+        index: true,
+        unique: true,
+        required: true,
+    },
+    passkey: {
         type: String,
         required: true,
     },
-    winner: {
-        type: String,
-        default: 'None',
+    room: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Tournament',
+        default: null,
     },
-    playerKeys: {
-        type: [String],
-        default: [],
+    token: {
+        type: String,
+    },
+    played: {
+        type: String,
+        default: null,
     },
 });
 
-const playersModel = mongoose.model('player', PlayerSchema);
+const playersModel = mongoose.model('Player', PlayerSchema);
 
 module.exports = { playersModel };

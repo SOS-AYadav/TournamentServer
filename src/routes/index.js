@@ -1,5 +1,6 @@
 const { adminLogin } = require('../controllers/adminLogin');
 const { generatePasskey } = require('../controllers/generatePasskey');
+const { getPlayers } = require('../controllers/getPlayers');
 const { getRoomId } = require('../controllers/getRoomId');
 const { randomizePlayers } = require('../controllers/randomizePlayers');
 const { usersMove } = require('../controllers/usersMove');
@@ -11,6 +12,7 @@ const appRoutes = (app) => {
     app.use('/usersMove', verifyToken, usersMove);
     app.use('/generatepasskey', generatePasskey);
     app.use('/randomize', randomizePlayers);
+    app.use('/getplayers', verifyToken, getPlayers);
     app.use('*', (_, res) =>
         res.status(200).json({ message: 'Oops! Invalid Route' })
     );

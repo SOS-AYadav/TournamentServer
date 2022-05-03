@@ -8,7 +8,6 @@ const adminLogin = async (req, res, next) => {
             const admin = await playersModel.findOne({
                 username: req.body.username,
             });
-            console.log(req.body.passkey, admin);
             if (
                 admin &&
                 (await bcrypt.compare(req.body.passkey, admin.passkey))
@@ -21,9 +20,10 @@ const adminLogin = async (req, res, next) => {
                     { expiresIn: '3h' }
                 );
                 admin.token = token;
+                await admin.save();
                 res.status(200).json({
                     status: 'ok',
-                    data: admin.token,
+                    data: { token },
                     error: '',
                 });
             } else {

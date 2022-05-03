@@ -13,6 +13,14 @@ const getRoomId = async (req, res, next) => {
                     error: 'All inputs required',
                 });
             }
+            if (username === 'admin') {
+                return res.status(200).json({
+                    status: 'error',
+                    data: '',
+                    error: 'Username is reserved!',
+                });
+            }
+
             const user = await playersModel
                 .findOne({ username })
                 .populate('room');

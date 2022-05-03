@@ -44,7 +44,9 @@ const shuffle = async (players, rooms) => {
 const randomizePlayers = async (req, res, next) => {
     try {
         if (req.method === 'GET') {
-            const players = await playersModel.find({ played: null });
+            const players = await playersModel.find({
+                $and: [{ played: null }, { username: { $ne: 'admin' } }],
+            });
             let rooms = await TournamentModel.find({ resultForWinner: null });
 
             if (players.length === 0) {

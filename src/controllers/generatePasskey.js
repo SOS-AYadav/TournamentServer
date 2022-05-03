@@ -9,7 +9,9 @@ const generatePasskey = async (req, res, next) => {
         if (req.method === 'POST') {
             if (parseInt(req.body.size) < 3) {
                 res.status(200).send({
-                    data: 'key of length more than 3 is required!',
+                    status: 'error',
+                    data: '',
+                    error: 'key of length more than 3 is required!',
                 });
             } else {
                 const { username, size } = req.body;
@@ -20,7 +22,9 @@ const generatePasskey = async (req, res, next) => {
                 console.log(playerExist);
                 if (playerExist) {
                     res.status(200).json({
-                        data: 'username already exists',
+                        status: 'error',
+                        data: '',
+                        error: 'username already exists',
                     });
                 } else {
                     const key = generateKey(size);

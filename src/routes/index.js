@@ -11,7 +11,7 @@ const appRoutes = (app) => {
     app.use('/getRoomId', getRoomId);
     app.use('/usersMove', verifyToken, usersMove);
     app.use('/generatepasskey', generatePasskey);
-    app.use('/randomize', randomizePlayers);
+    app.use('/randomize', verifyToken, randomizePlayers);
     app.use('/getplayers', verifyToken, getPlayers);
     app.use('*', (_, res) =>
         res.status(200).json({ message: 'Oops! Invalid Route' })

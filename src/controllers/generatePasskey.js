@@ -5,7 +5,6 @@ const { playersModel } = require('../models/players');
 
 const generatePasskey = async (req, res, next) => {
     try {
-        console.log(req.body);
         if (req.method === 'POST') {
             if (parseInt(req.body.size) < 3) {
                 res.status(200).send({
@@ -19,7 +18,6 @@ const generatePasskey = async (req, res, next) => {
                 const playerExist = await playersModel.findOne({
                     username,
                 });
-                console.log(playerExist);
                 if (playerExist) {
                     res.status(200).json({
                         status: 'error',

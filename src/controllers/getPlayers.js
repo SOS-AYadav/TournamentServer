@@ -3,11 +3,9 @@ const { TournamentModel } = require('../models/tournament');
 const getPlayers = async (req, res, next) => {
     try {
         if (req.method === 'POST') {
-            console.log(req.body);
             const tournamentPlayers = await TournamentModel.findOne({
                 room: req.body.room,
             }).populate('players');
-            console.log(tournamentPlayers);
             const players = tournamentPlayers.players.map(
                 (player) => player.username
             );
@@ -25,7 +23,7 @@ const getPlayers = async (req, res, next) => {
             });
         }
     } catch (error) {
-        throw error;
+        next(error);
     }
 };
 

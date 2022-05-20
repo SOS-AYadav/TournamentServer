@@ -6,7 +6,6 @@ const setup = require('./setup');
 const shuffle = async (players, rooms) => {
     try {
         shufflePlayersId(players);
-        console.log(players, rooms);
         for (
             let roomIndex = 0, playerIndex = 1;
             roomIndex < rooms.length;
@@ -16,12 +15,10 @@ const shuffle = async (players, rooms) => {
                 players[playerIndex - 1],
                 players[playerIndex],
             ];
-            console.log(players);
 
             // const currentRoom = await TournamentModel.findOne(
             //     rooms[roomIndex].id
             // );
-            console.log('rooooooooom', rooms[roomIndex]);
             player1.room = rooms[roomIndex];
             player2.room = rooms[roomIndex];
             await player1.save();
@@ -66,9 +63,10 @@ const randomizePlayers = async (req, res, next) => {
                     await shuffle(players, rooms);
                 } else {
                     const roomsToCreate =
-                        parseInt(players.length / 2) - rooms.length;
-                    console.log(roomsToCreate);
+                        ParseInt(players.length / 2) - rooms.length;
+
                     await setup(roomsToCreate);
+
                     let updatedRooms = await TournamentModel.find({
                         resultForWinner: null,
                     });

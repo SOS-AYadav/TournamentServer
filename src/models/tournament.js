@@ -15,6 +15,10 @@ const TournamentSchema = new mongoose.Schema({
         type: String,
         default: null,
     },
+    grid: {
+        type: String,
+        default: '#########',
+    },
     players: {
         type: [mongoose.Schema.Types.ObjectId],
         ref: 'Player',

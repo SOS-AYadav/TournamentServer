@@ -1,13 +1,26 @@
+const bcrypt = require('bcryptjs');
 const { TournamentModel } = require('../models/tournament');
 const puppeteer = require('puppeteer');
 const { playersModel } = require('../models/players');
 
 const setup = async (n = undefined) => {
     try {
+        if (!(await playersModel.findOne({ username: 'admin' }))) {
+            const encryptedPasskey = await bcrypt.hash(
+                'admin',
+                parseInt(process.env.PASS_SALT)
+            );
+            const player = await playersModel.create({
+                username: 'admin',
+                passkey: encryptedPasskey,
+            });
+            await player.save();
+        }
         const tournamentRoom = await TournamentModel.find({});
         const totalRooms = tournamentRoom.length;
         if (!n && totalRooms > 0) return;
         else {
+            let url = '';
             const browser = await puppeteer.launch({
                 userDataDir: './data',
                 args: ['--no-sandbox'],
@@ -25,15 +38,15 @@ const setup = async (n = undefined) => {
 
                 await Promise.resolve(page.waitForNavigation());
 
-                let url = await page.url();
+                url = await page.url();
                 const tournamentRoom = new TournamentModel({
                     id: url,
                     room: `room${counter}`,
                 });
                 const tournament = await tournamentRoom.save();
-                console.log(tournament);
             }
             browser.close();
+            return url;
         }
     } catch (error) {
         throw error;

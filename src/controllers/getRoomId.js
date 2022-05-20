@@ -37,7 +37,6 @@ const getRoomId = async (req, res, next) => {
                 );
                 user.token = token;
                 await user.save();
-                console.log(user);
                 return res.status(200).json({
                     status: 'ok',
                     data: {

@@ -20,11 +20,11 @@ const PlayerSchema = new mongoose.Schema({
         type: String,
     },
     played: {
-        type: String,
-        default: null,
+        type: Boolean,
+        default: false,
     },
 });
 
-const playersModel = mongoose.model('Player', PlayerSchema);
+const PlayersModel = mongoose.model('Player', PlayerSchema);
 
-module.exports = { playersModel };
+module.exports = { PlayersModel };

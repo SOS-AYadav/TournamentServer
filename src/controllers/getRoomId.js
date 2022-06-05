@@ -1,6 +1,6 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { playersModel } = require('../models/players');
+const { PlayersModel } = require('../models/players');
 const { TournamentModel } = require('../models/tournament');
 const getRoomId = async (req, res, next) => {
     try {
@@ -21,9 +21,9 @@ const getRoomId = async (req, res, next) => {
                 });
             }
 
-            const user = await playersModel
-                .findOne({ username })
-                .populate('room');
+            const user = await PlayersModel.findOne({ username }).populate(
+                'room'
+            );
             if (user && (await bcrypt.compare(passkey, user.passkey))) {
                 const token = jwt.sign(
                     {

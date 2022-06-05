@@ -19,6 +19,10 @@ const TournamentSchema = new mongoose.Schema({
         type: String,
         default: '#########',
     },
+    defaultValue: {
+        type: String,
+        default: 'X',
+    },
     players: {
         type: [mongoose.Schema.Types.ObjectId],
         ref: 'Player',

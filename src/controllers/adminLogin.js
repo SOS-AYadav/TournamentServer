@@ -1,11 +1,11 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { playersModel } = require('../models/players');
+const { PlayersModel } = require('../models/players');
 
 const adminLogin = async (req, res, next) => {
     try {
         if (req.method === 'POST') {
-            const admin = await playersModel.findOne({
+            const admin = await PlayersModel.findOne({
                 username: req.body.username,
             });
             if (

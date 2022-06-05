@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { generateKey } = require('../utility');
-const { playersModel } = require('../models/players');
+const { PlayersModel } = require('../models/players');
 
 const generatePasskey = async (req, res, next) => {
     try {
@@ -15,7 +15,7 @@ const generatePasskey = async (req, res, next) => {
             } else {
                 const { username, size } = req.body;
 
-                const playerExist = await playersModel.findOne({
+                const playerExist = await PlayersModel.findOne({
                     username,
                 });
                 if (playerExist) {
@@ -30,7 +30,7 @@ const generatePasskey = async (req, res, next) => {
                         key,
                         parseInt(process.env.PASS_SALT)
                     );
-                    const player = new playersModel({
+                    const player = new PlayersModel({
                         username,
                         passkey: encryptedPasskey,
                     });

@@ -1,16 +1,16 @@
 const bcrypt = require('bcryptjs');
 const { TournamentModel } = require('../models/tournament');
 const puppeteer = require('puppeteer');
-const { playersModel } = require('../models/players');
+const { PlayersModel } = require('../models/players');
 
 const setup = async (n = undefined) => {
     try {
-        if (!(await playersModel.findOne({ username: 'admin' }))) {
+        if (!(await PlayersModel.findOne({ username: 'admin' }))) {
             const encryptedPasskey = await bcrypt.hash(
                 'admin',
                 parseInt(process.env.PASS_SALT)
             );
-            const player = await playersModel.create({
+            const player = await PlayersModel.create({
                 username: 'admin',
                 passkey: encryptedPasskey,
             });
@@ -43,7 +43,7 @@ const setup = async (n = undefined) => {
                     id: url,
                     room: `room${counter}`,
                 });
-                const tournament = await tournamentRoom.save();
+                await tournamentRoom.save();
             }
             browser.close();
             return url;

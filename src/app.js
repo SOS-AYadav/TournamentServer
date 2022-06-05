@@ -6,7 +6,7 @@ const appRoutes = require('./routes');
 const { Server } = require('socket.io');
 const { createServer } = require('http');
 const { errorHandler } = require('./errorHandler');
-// const { run } = require('./temp');
+const { run } = require('./temp');
 require('./models/db');
 require('dotenv').config();
 
@@ -24,7 +24,7 @@ app.use(
 );
 
 app.use(express.json());
-// app.use(run);
+app.use(run);
 appRoutes(app);
 
 // io.attachApp(app)

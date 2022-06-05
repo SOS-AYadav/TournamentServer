@@ -1,6 +1,6 @@
 const { Queue, QueueScheduler, Worker } = require('bullmq');
 const setup = require('./controllers/setup');
-const { playersModel } = require('./models/players');
+const { PlayersModel } = require('./models/players');
 const { TournamentModel } = require('./models/tournament');
 
 const connection = {
@@ -19,26 +19,39 @@ const mainJobQueue = new Queue('main', {
 const mainWorker = new Worker(
     'main',
     async (job) => {
-        let url = undefined;
-        const players = await playersModel.find({
-            $and: [{ played: null }, { username: { $ne: 'admin' } }],
-        });
+        if (job.name === 'createRoom') {
+            let url = undefined;
+            const players = await PlayersModel.find({
+                $and: [{ played: false }, { username: { $ne: 'admin' } }],
+            });
 
-        const rooms = await TournamentModel.find({ resultForWinner: null });
+            const rooms = await TournamentModel.find({ resultForWinner: null });
 
-        if (players.length === rooms.length * 2) {
+            if (players.length !== rooms.length * 2) {
+                const roomsToCreate =
+                    Math.floor(players.length / 2) - rooms.length;
+                url = await setup(roomsToCreate);
+                await job.updateProgress(100);
+                return url;
+            }
         } else {
-            const roomsToCreate = Math.round(players.length / 2) - rooms.length;
-            url = await setup(roomsToCreate);
+            const players = await PlayersModel.find({
+                played: true,
+            });
+            const rooms = await TournamentModel.find({
+                resultForWinner: { $ne: null },
+            });
+            if (rooms.length * 2 === players.length) {
+                await setup(players.length / 2);
+            }
         }
-        await job.updateProgress(100);
-        return url;
     },
     {
         connection: connection,
     }
 );
 mainWorker.on('completed', (job, data) => {
+    console.log('running background tasks...');
     data &&
         console.log(
             `***************************** Job '${job.name}' completed successfully. Room ${data} is created*****************************`
@@ -56,8 +69,7 @@ const run = async (req, res, next) => {
         {},
         {
             repeat: {
-                every: 5000,
-                limit: 5,
+                every: 3000,
             },
             jobId: '#room',
         }
@@ -69,12 +81,10 @@ const run = async (req, res, next) => {
         {
             repeat: {
                 every: 5000,
-                limit: 5,
             },
             jobId: '#newGame',
         }
     );
-
     next();
 };
 

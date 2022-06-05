@@ -1,4 +1,4 @@
-const { playersModel } = require('../models/players');
+const { PlayersModel } = require('../models/players');
 const { TournamentModel } = require('../models/tournament');
 const { shufflePlayersId } = require('../utility');
 const setup = require('./setup');
@@ -41,8 +41,8 @@ const shuffle = async (players, rooms) => {
 const randomizePlayers = async (req, res, next) => {
     try {
         if (req.method === 'GET') {
-            const players = await playersModel.find({
-                $and: [{ played: null }, { username: { $ne: 'admin' } }],
+            const players = await PlayersModel.find({
+                $and: [{ played: false }, { username: { $ne: 'admin' } }],
             });
             let rooms = await TournamentModel.find({ resultForWinner: null });
 

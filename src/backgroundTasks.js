@@ -51,7 +51,7 @@ const mainWorker = new Worker(
     }
 );
 mainWorker.on('completed', (job, data) => {
-    console.log('running background tasks...');
+    // console.log('running background tasks...');
     data &&
         console.log(
             `***************************** Job '${job.name}' completed successfully. Room ${data} is created*****************************`

@@ -6,14 +6,20 @@ const appRoutes = require('./routes');
 const { Server } = require('socket.io');
 const { createServer } = require('http');
 const { errorHandler } = require('./errorHandler');
-const { run } = require('./temp');
+const { run } = require('./backgroundTasks');
 require('./models/db');
 require('dotenv').config();
 
 setup();
 const app = express();
 const httpServer = createServer(app);
-const io = new Server(httpServer);
+const io = new Server(httpServer, {
+    cors: {
+        origin: process.env.CLIENT_URL,
+        methods: ['GET', 'POST'],
+        allowedHeaders: ['Access-Control-Allow-Origin'],
+    },
+});
 
 app.use(cors());
 
@@ -25,18 +31,25 @@ app.use(
 
 app.use(express.json());
 app.use(run);
-appRoutes(app);
 
-// io.attachApp(app)
+// io.attachApp(app);
 
-io.on('connection', (socket) => {
-    console.log('hello', socket);
-    socket.emit('test');
+io.on('connection', function (socket) {
+    socket.emit('greeting-from-server', {
+        greeting: 'Hello Client',
+    });
+    socket.on('greeting-from-client', function (message) {
+        console.log(message);
+    });
 });
+
+appRoutes(app, socket);
 
 app.use(errorHandler);
 
-httpServer.listen(4001, () => console.error('listening on 4001'));
+httpServer.listen(process.env.API_PORT, () =>
+    console.log(`listening on ${process.env.API_PORT}`)
+);
 
 // setup()
 // const app = express()

@@ -40,7 +40,7 @@ const generatePasskey = async (req, res, next) => {
                             size,
                         },
                         process.env.TOKEN_KEY,
-                        { expiresIn: '3h' }
+                        { expiresIn: '1d' }
                     );
                     player.token = token;
                     const newPlayerData = await player.save();

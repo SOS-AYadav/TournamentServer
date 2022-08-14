@@ -5,12 +5,13 @@ const { calculateWinner } = require('../utility');
 
 const usersMove = async (socket) => {
     try {
-        const room = socket.user?.roomId || socket.body;
-        const value = socket.body;
+        const roomId = socket.body.roomId;
+        const value = socket.body.value;
         const username = socket.user?.username;
-        console.log(room, username, value);
+
+        console.log(socket.rooms, roomId, username, value);
         const roomData = await TournamentModel.findOne({
-            room,
+            id: roomId,
         }).populate('players');
 
         if (roomData?.resultForWinner) {
@@ -28,11 +29,11 @@ const usersMove = async (socket) => {
                 error: 'Match over!',
             });
         } else if (roomData?.firstMove === username) {
-            const player = await PlayersModel.findOne({ username });
-            if (!player?.played) {
-                player.played = true;
-                await player.save();
-            }
+            // const player = await PlayersModel.findOne({ username });
+            // if (!player?.played) {
+            //     player.played = true;
+            //     await player.save();
+            // }
             if (roomData.grid[parseInt(value)] === '#') {
                 const browser = await puppeteer.launch({
                     userDataDir: './data',
@@ -72,17 +73,27 @@ const usersMove = async (socket) => {
                     if (winner) {
                         roomData.resultForWinner = username;
                         roomData.resultForLoser = players[0];
+                        const player = await PlayersModel.findOne({
+                            username: players[0],
+                        });
+                        player.played = true;
+                        await player.save();
+
+                        const lastStandingPlayer = await PlayersModel.find({
+                            played: false,
+                        });
+
+                        const done = lastStandingPlayer.length === 1;
+
+                        socket.to(roomId).emit('winner', {
+                            status: 'ok',
+                            data: { username, done },
+                            error: '',
+                        });
                     }
                     await roomData.save();
 
-                    return (
-                        winner &&
-                        socket.broadcast.emit('winner', {
-                            status: 'ok',
-                            data: username,
-                            error: '',
-                        })
-                    );
+                    return;
                     // return res.status(200).json({
                     //     status: 'ok',
                     //     data: winner ? username : '',
@@ -119,6 +130,10 @@ const usersMove = async (socket) => {
             //     data: '',
             //     error: 'Wait for your turn!',
             // });
+
+            if (!username) {
+                return;
+            }
             return socket.emit('exception', {
                 status: 'error',
                 data: '',
@@ -126,7 +141,7 @@ const usersMove = async (socket) => {
             });
         }
     } catch (error) {
-        throw error;
+        console.error(error);
     }
 };
 

@@ -6,9 +6,8 @@ const appRoutes = require('./routes');
 const { Server } = require('socket.io');
 const { createServer } = require('http');
 const { errorHandler } = require('./errorHandler');
-// const { run } = require('./backgroundTasks');
-const jwt = require('jsonwebtoken');
-const { usersMove } = require('./controllers/usersMove');
+const { run } = require('./backgroundTasks');
+const { socketApi } = require('./controllers/socketApi');
 require('./models/db');
 require('dotenv').config();
 
@@ -32,56 +31,13 @@ app.use(
 );
 
 app.use(express.json());
-// app.use(run);
+app.use(run);
 
 appRoutes(app);
 
 // io.attachApp(app);
-io.use((socket, next) => {
-    const token = socket.handshake.auth.token;
-    console.log(token, 'tokenzzz');
-    if (token) {
-        if (token.toLowerCase() === process.env.VIEWER) {
-            next();
-        } else {
-            try {
-                const decoded = jwt.verify(token, process.env.TOKEN_KEY);
-                socket.user = decoded;
-                console.log(decoded);
-                next();
-            } catch {
-                next(
-                    new Error(
-                        JSON.stringify({
-                            status: 'error',
-                            data: '',
-                            error: 'Authentication Error!',
-                        })
-                    )
-                );
-                // next(new Error(error));
-            }
-        }
-    } else {
-        console.log('errror');
-        // throw Error('Auth');
-        // next();
-        next(
-            new Error(
-                JSON.stringify({
-                    status: 'error',
-                    data: '',
-                    error: 'Authentication Error!',
-                })
-            )
-        );
-    }
-}).on('connection', (socket) => {
-    socket.on('usermove', (msg) => {
-        socket.body = msg;
-        usersMove(socket);
-    });
-});
+
+socketApi(io);
 
 app.use(errorHandler);
 

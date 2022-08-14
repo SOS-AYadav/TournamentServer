@@ -13,6 +13,7 @@ const setup = async (n = undefined) => {
             const player = await PlayersModel.create({
                 username: 'admin',
                 passkey: encryptedPasskey,
+                played: true,
             });
             await player.save();
         }

@@ -12,7 +12,7 @@ const PlayerSchema = new mongoose.Schema({
         required: true,
     },
     room: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: [mongoose.Schema.Types.ObjectId],
         ref: 'Tournament',
         default: null,
     },

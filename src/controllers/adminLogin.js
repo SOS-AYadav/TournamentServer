@@ -17,7 +17,7 @@ const adminLogin = async (req, res, next) => {
                         username: admin.username,
                     },
                     process.env.TOKEN_KEY,
-                    { expiresIn: '3h' }
+                    { expiresIn: '1d' }
                 );
                 admin.token = token;
                 await admin.save();

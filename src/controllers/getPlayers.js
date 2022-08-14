@@ -4,7 +4,7 @@ const getPlayers = async (req, res, next) => {
     try {
         if (req.method === 'POST') {
             const tournamentPlayers = await TournamentModel.findOne({
-                room: req.body.room,
+                id: req.body.roomId,
             }).populate('players');
             const players = tournamentPlayers.players.map(
                 (player) => player.username

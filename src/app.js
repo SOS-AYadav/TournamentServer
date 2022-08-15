@@ -35,8 +35,6 @@ app.use(run);
 
 appRoutes(app);
 
-// io.attachApp(app);
-
 socketApi(io);
 
 app.use(errorHandler);
@@ -44,19 +42,3 @@ app.use(errorHandler);
 httpServer.listen(process.env.API_PORT, () =>
     console.log(`listening on ${process.env.API_PORT}`)
 );
-
-// setup()
-// const app = express()
-// app.use(cors())
-
-// app.use(
-//     bodyParser.urlencoded({
-//         extended: true,
-//     })
-// )
-
-// app.use(express.json())
-
-// appRoutes(app)
-
-// app.listen(4000, () => console.log('Listening on 4000...'))

@@ -13,11 +13,11 @@ const loginUser = async (req, res, next) => {
                     error: 'All inputs required',
                 });
             }
-            if (username === 'admin') {
+            if (username.toLowerCase() === process.env.ADMIN) {
                 return res.status(200).json({
                     status: 'error',
                     data: '',
-                    error: 'Username is reserved!',
+                    error: 'Invalid Credentials',
                 });
             }
             const user = await PlayersModel.findOne({ username });

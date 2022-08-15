@@ -9,13 +9,11 @@ const usersMove = async (socket) => {
         const value = socket.body.value;
         const username = socket.user?.username;
 
-        console.log(socket.rooms, roomId, username, value);
         const roomData = await TournamentModel.findOne({
             id: roomId,
         }).populate('players');
 
         if (roomData?.resultForWinner) {
-            console.log(socket.handshake.auth.token, process.env.VIEWER);
             if (socket.handshake.auth.token === process.env.VIEWER) {
                 return socket.emit('winner', {
                     status: 'ok',
@@ -29,11 +27,6 @@ const usersMove = async (socket) => {
                 error: 'Match over!',
             });
         } else if (roomData?.firstMove === username) {
-            // const player = await PlayersModel.findOne({ username });
-            // if (!player?.played) {
-            //     player.played = true;
-            //     await player.save();
-            // }
             if (roomData.grid[parseInt(value)] === '#') {
                 const browser = await puppeteer.launch({
                     userDataDir: './data',
@@ -94,43 +87,21 @@ const usersMove = async (socket) => {
                     await roomData.save();
 
                     return;
-                    // return res.status(200).json({
-                    //     status: 'ok',
-                    //     data: winner ? username : '',
-                    //     error: '',
-                    // });
                 }
-                // return res.status(200).json({
-                //     status: 'error',
-                //     data: '',
-                //     error: 'Something went wrong. Try again!',
-                // });
+
                 return socket.emit('exception', {
                     status: 'error',
                     data: '',
                     error: 'Something went wrong. Try again!',
                 });
             } else {
-                // res.status(200).json({
-                //     status: 'error',
-                //     data: '',
-                //     error: 'Wrong move',
-                // });
                 socket.emit('exception', {
                     status: 'error',
                     data: '',
                     error: 'Wrong move',
                 });
             }
-            // await element.click()
-            // await page.screenshot({ path: 'example.png' });
         } else {
-            // res.status(200).json({
-            //     status: 'error',
-            //     data: '',
-            //     error: 'Wait for your turn!',
-            // });
-
             if (!username) {
                 return;
             }

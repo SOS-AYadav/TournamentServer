@@ -5,6 +5,13 @@ const { PlayersModel } = require('../models/players');
 const adminLogin = async (req, res, next) => {
     try {
         if (req.method === 'POST') {
+            if (req.body.username.toLowerCase() !== process.env.ADMIN) {
+                return res.status(200).json({
+                    status: 'error',
+                    data: '',
+                    error: 'Invalid Credentials',
+                });
+            }
             const admin = await PlayersModel.findOne({
                 username: req.body.username,
             });

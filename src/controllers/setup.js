@@ -3,15 +3,15 @@ const { TournamentModel } = require('../models/tournament');
 const puppeteer = require('puppeteer');
 const { PlayersModel } = require('../models/players');
 
-const setup = async (n = undefined) => {
+const setup = async (n) => {
     try {
-        if (!(await PlayersModel.findOne({ username: 'admin' }))) {
+        if (!(await PlayersModel.findOne({ username: process.env.ADMIN }))) {
             const encryptedPasskey = await bcrypt.hash(
-                'admin',
+                process.env.ADMIN,
                 parseInt(process.env.PASS_SALT)
             );
             const player = await PlayersModel.create({
-                username: 'admin',
+                username: process.env.ADMIN,
                 passkey: encryptedPasskey,
                 played: true,
             });

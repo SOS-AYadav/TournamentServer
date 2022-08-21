@@ -5,7 +5,8 @@ const { PlayersModel } = require('../models/players');
 const adminLogin = async (req, res, next) => {
     try {
         if (req.method === 'POST') {
-            if (req.body.username.toLowerCase() !== process.env.ADMIN) {
+            const username = req.body.username.trim().toLowerCase();
+            if (username !== process.env.ADMIN) {
                 return res.status(200).json({
                     status: 'error',
                     data: '',
@@ -13,7 +14,7 @@ const adminLogin = async (req, res, next) => {
                 });
             }
             const admin = await PlayersModel.findOne({
-                username: req.body.username,
+                username: username,
             });
             if (
                 admin &&

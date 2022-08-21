@@ -6,15 +6,15 @@ const { PlayersModel } = require('../models/players');
 const generatePasskey = async (req, res, next) => {
     try {
         if (req.method === 'POST') {
-            if (parseInt(req.body.size) < 3) {
+            const username = req.body.username.trim().toLowerCase();
+            const size = parseInt(req.body.size);
+            if (size < 3) {
                 res.status(200).send({
                     status: 'error',
                     data: '',
                     error: 'key of length more than 3 is required!',
                 });
             } else {
-                const { username, size } = req.body;
-
                 const playerExist = await PlayersModel.findOne({
                     username,
                 });

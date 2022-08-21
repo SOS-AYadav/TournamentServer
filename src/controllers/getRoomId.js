@@ -7,7 +7,7 @@ const getRoomId = async (socket) => {
         const roomId = user.room[user.room.length - 1].id;
 
         await socket.join(roomId);
-        console.log('roommm', socket.rooms);
+
         socket.emit('roomId', {
             status: 'ok',
             data: {

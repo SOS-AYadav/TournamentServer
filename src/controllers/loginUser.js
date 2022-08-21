@@ -5,7 +5,8 @@ const { PlayersModel } = require('../models/players');
 const loginUser = async (req, res, next) => {
     try {
         if (req.method === 'POST') {
-            const { username, passkey } = req.body;
+            const username = req.body.username.trim().toLowerCase();
+            const passkey = req.body.passkey;
             if (!(username && passkey)) {
                 return res.status(200).json({
                     status: 'error',
